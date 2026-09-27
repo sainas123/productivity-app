@@ -7,7 +7,6 @@ import {
   Copy, 
   Download, 
   Upload, 
-  Sparkles,
   Save,
   Undo2,
   CheckCircle2
@@ -83,50 +82,10 @@ export const Header: React.FC<HeaderProps> = ({
     : null;
 
   return (
-    <header className="glass-panel header-container" style={{ padding: '1rem 1.5rem' }}>
-      <div className="header-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="glass-panel header-container" style={{ padding: '0.85rem 1.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.85rem' }}>
         
-        {/* App Title & Save Status Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ 
-            background: 'linear-gradient(135deg, var(--accent-primary), #a855f7)', 
-            width: '38px', 
-            height: '38px', 
-            borderRadius: '10px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)'
-          }}>
-            <Sparkles size={20} color="#fff" />
-          </div>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '-0.02em', color: '#fff', lineHeight: 1.2 }}>
-              Visual Time Tracker
-            </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.1rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                24-Hour Day Sheet
-              </span>
-              {formattedSavedTime && (
-                <span style={{
-                  fontSize: '0.7rem',
-                  color: '#10b981',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  padding: '1px 6px',
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.2rem'
-                }}>
-                  <CheckCircle2 size={10} /> Saved {formattedSavedTime}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Date Navigation */}
+        {/* Date Navigator & Save Status Indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button 
             className="btn btn-sm" 
@@ -151,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
                 fontWeight: '600',
                 cursor: 'pointer',
                 background: 'rgba(0, 0, 0, 0.4)',
-                minWidth: '210px',
+                minWidth: '220px',
                 appearance: 'auto'
               }}
             >
@@ -176,17 +135,34 @@ export const Header: React.FC<HeaderProps> = ({
             <button 
               className="btn btn-sm btn-primary" 
               onClick={() => onDateChange(todayStr)}
-              style={{ marginLeft: '0.25rem' }}
+              style={{ marginLeft: '0.15rem' }}
             >
               Today
             </button>
           )}
+
+          {formattedSavedTime && (
+            <span style={{
+              fontSize: '0.7rem',
+              color: '#10b981',
+              background: 'rgba(16, 185, 129, 0.15)',
+              padding: '4px 8px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              fontWeight: '600',
+              marginLeft: '0.25rem'
+            }}>
+              <CheckCircle2 size={12} /> Saved {formattedSavedTime}
+            </span>
+          )}
         </div>
 
-        {/* Quick Toolbar Actions */}
+        {/* Timesheet Actions Bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           
-          {/* Save Day Snapshot Button */}
+          {/* Save Day Progress Button */}
           <button
             className="btn btn-sm btn-primary"
             onClick={onSaveSnapshot}
@@ -227,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({
             title="Clear all blocks for current date"
           >
             <RotateCcw size={14} />
-            <span className="hide-mobile">Clear</span>
+            <span className="hide-mobile">Clear Day</span>
           </button>
 
           <div style={{ borderLeft: '1px solid var(--bg-card-border)', height: '20px', margin: '0 0.15rem' }} />
@@ -249,6 +225,6 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
       </div>
-    </header>
+    </div>
   );
 };

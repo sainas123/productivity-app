@@ -2,15 +2,18 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Activity, TimeTrackerData, DayLog } from './types/timeTracker';
 import { loadStorageData, saveStorageData } from './utils/storage';
 import { getTodayDateString, createEmptyDayBlocks, parseDateString, offsetDays, formatDateString } from './utils/timeHelpers';
+import { Navbar } from './components/Navbar';
 import { Header } from './components/Header';
 import { ActivitiesPanel } from './components/ActivitiesPanel';
 import { TimesheetGrid } from './components/TimesheetGrid';
 import { DailySummary } from './components/DailySummary';
+import { Summarizer } from './components/Summarizer';
 import { ActivityModal } from './components/ActivityModal';
 
 export const App: React.FC = () => {
   const [data, setData] = useState<TimeTrackerData>(() => loadStorageData());
   const [currentDate, setCurrentDate] = useState<string>(() => getTodayDateString());
+  const [activeTab, setActiveTab] = useState<'timesheet' | 'summarizer'>('timesheet');
   const [activeActivityId, setActiveActivityId] = useState<string | null>(() => {
     return data.activities.length > 0 ? data.activities[0].id : null;
   });
@@ -291,64 +294,82 @@ export const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      {/* Header & Date Navigation */}
-      <Header
-        currentDate={currentDate}
-        onDateChange={setCurrentDate}
-        onClearDay={handleClearDay}
-        onCopyPreviousDay={handleCopyPreviousDay}
-        onExportData={handleExportData}
-        onImportData={handleImportData}
-        savedSnapshotAt={currentDayLog.savedSnapshot?.savedAt || null}
-        onSaveSnapshot={handleSaveSnapshot}
-        onRestoreSnapshot={handleRestoreSnapshot}
+      {/* Top Navbar (Always Visible) */}
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
-      {/* Main Grid + Activities Panel Split View */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '300px 1fr',
-        gap: '1.25rem',
-        alignItems: 'start'
-      }} className="main-content-grid">
-        
-        {/* Left Side: Activities Panel */}
-        <aside style={{ position: 'sticky', top: '1.25rem' }}>
-          <ActivitiesPanel
-            activities={data.activities}
-            activeActivityId={activeActivityId}
-            onSelectActivity={setActiveActivityId}
-            onAddActivityClick={() => {
-              setEditingActivity(null);
-              setIsModalOpen(true);
-            }}
-            onEditActivityClick={(act) => {
-              setEditingActivity(act);
-              setIsModalOpen(true);
-            }}
-            onDeleteActivityClick={handleDeleteActivity}
-            activityTotals={activityTotals}
-          />
-        </aside>
-
-        {/* Right Side: 24-Hour Timesheet Grid */}
-        <main>
-          <TimesheetGrid
+      {/* Main Content Area */}
+      {activeTab === 'timesheet' ? (
+        <>
+          {/* Sub Header Date Navigator for Timesheet */}
+          <Header
             currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            onClearDay={handleClearDay}
+            onCopyPreviousDay={handleCopyPreviousDay}
+            onExportData={handleExportData}
+            onImportData={handleImportData}
+            savedSnapshotAt={currentDayLog.savedSnapshot?.savedAt || null}
+            onSaveSnapshot={handleSaveSnapshot}
+            onRestoreSnapshot={handleRestoreSnapshot}
+          />
+
+          {/* Main Grid + Activities Panel Split View */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '300px 1fr',
+            gap: '1.25rem',
+            alignItems: 'start'
+          }} className="main-content-grid">
+            
+            {/* Left Side: Activities Panel */}
+            <aside style={{ position: 'sticky', top: '1.25rem' }}>
+              <ActivitiesPanel
+                activities={data.activities}
+                activeActivityId={activeActivityId}
+                onSelectActivity={setActiveActivityId}
+                onAddActivityClick={() => {
+                  setEditingActivity(null);
+                  setIsModalOpen(true);
+                }}
+                onEditActivityClick={(act) => {
+                  setEditingActivity(act);
+                  setIsModalOpen(true);
+                }}
+                onDeleteActivityClick={handleDeleteActivity}
+                activityTotals={activityTotals}
+              />
+            </aside>
+
+            {/* Right Side: 24-Hour Timesheet Grid */}
+            <main>
+              <TimesheetGrid
+                currentDate={currentDate}
+                blocks={currentDayLog.blocks}
+                activities={data.activities}
+                activeActivityId={activeActivityId}
+                onUpdateBlock={handleUpdateBlock}
+                onUpdateBlockRange={handleUpdateBlockRange}
+              />
+            </main>
+          </div>
+
+          {/* Daily Summary Analytics Footer */}
+          <DailySummary
             blocks={currentDayLog.blocks}
             activities={data.activities}
-            activeActivityId={activeActivityId}
-            onUpdateBlock={handleUpdateBlock}
-            onUpdateBlockRange={handleUpdateBlockRange}
           />
-        </main>
-      </div>
-
-      {/* Daily Summary Analytics Footer */}
-      <DailySummary
-        blocks={currentDayLog.blocks}
-        activities={data.activities}
-      />
+        </>
+      ) : (
+        /* Screen Time Analytics Summarizer Dashboard */
+        <Summarizer
+          data={data}
+          currentDate={currentDate}
+          onDateChange={setCurrentDate}
+        />
+      )}
 
       {/* Add / Edit Activity Modal */}
       <ActivityModal
